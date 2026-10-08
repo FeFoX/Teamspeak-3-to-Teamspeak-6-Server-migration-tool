@@ -1,0 +1,17 @@
+# user data and secrets must never be committed
+*.sqlitedb
+*.sqlitedb-wal
+*.sqlitedb-shm
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+*.db
+legacy.sqlite
+state*.sqlite
+permissionlist.json
+*.log
+first-run-credentials.txt
+.env
+data/
+backup/
+__pycache__/

@@ -1,0 +1,20 @@
+# Minimal TeamSpeak 6 beta server for testing a migration.
+# Runs as the host user so the data directory can be edited without sudo.
+services:
+  teamspeak6:
+    image: teamspeaksystems/teamspeak6-server:latest
+    container_name: teamspeak6-migration-test
+    restart: "no"
+    user: "1000:1000"            # change to your uid:gid
+    ports:
+      - "9987:9987/udp"          # voice
+      - "30033:30033/tcp"        # file transfer: icons and avatars are downloaded here
+      - "127.0.0.1:10080:10080/tcp"   # Web Query, keep it on localhost
+    environment:
+      - TSSERVER_LICENSE_ACCEPTED=accept
+      - TSSERVER_QUERY_HTTP_ENABLED=1
+    volumes:
+      - ./data:/var/tsserver
+# After the first start:
+#  * read the admin API key and privilege key from `docker compose logs`
+#  * add the Docker gateway address (see `docker network inspect`) to data/query_ip_allowlist.txt
