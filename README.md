@@ -70,6 +70,25 @@ remapper recomputes the old SHA-1 UID at connect time and looks the person up.
    Environment variables: `TS6_QUERY_URL`, `TS6_API_KEY`, `LEGACY_DB`, `STATE_DB`,
    `POLL_SECONDS`, `DRY_RUN`, `TS6_DB`, `AVATAR_DIR`, `DST_SERVER`.
 
+### Run the remapper as a service (systemd)
+
+A plain `nohup python3 remapper.py &` stops at the next reboot. To keep it running:
+
+```sh
+sudo mkdir -p /opt/teamspeak6/remapper
+sudo cp ts3_to_ts6/remapper.py legacy.sqlite /opt/teamspeak6/remapper/
+cp examples/remapper.env.example /opt/teamspeak6/remapper/remapper.env   # edit it, then:
+chmod 600 /opt/teamspeak6/remapper/remapper.env
+sudo cp examples/ts6-remapper.service /etc/systemd/system/                # adjust User and paths
+sudo systemctl daemon-reload && sudo systemctl enable --now ts6-remapper
+journalctl -u ts6-remapper -f                                             # follow the log
+```
+
+The unit runs the script as an unprivileged user with `ProtectSystem=strict`, so it can only
+write to its own folder and the TS6 data folder. The remapper is **not** part of the TS6
+container: it runs on the host, talks to the Web Query, and edits the bind-mounted data
+folder directly. Its state is in `state.sqlite`, so restarts do not re-apply anything.
+
 ## Gotchas found along the way
 
 * **Web Query silently stops answering** if the client IP is not on `query_ip_allowlist.txt`.

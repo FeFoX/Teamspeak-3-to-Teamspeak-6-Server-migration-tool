@@ -1,0 +1,28 @@
+# systemd unit for the reconnect remapper.
+# Install:  sudo cp ts6-remapper.service /etc/systemd/system/
+#           sudo systemctl daemon-reload && sudo systemctl enable --now ts6-remapper
+# Adjust User/Group and every path below to your setup.
+[Unit]
+Description=TeamSpeak 3 to 6 reconnect remapper
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=teamspeak
+Group=teamspeak
+WorkingDirectory=/opt/teamspeak6/remapper
+EnvironmentFile=/opt/teamspeak6/remapper/remapper.env
+ExecStart=/usr/bin/python3 -I /opt/teamspeak6/remapper/remapper.py
+Restart=on-failure
+RestartSec=5
+
+# hardening: it only needs its own folder and the TS6 data folder
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/opt/teamspeak6/remapper /opt/teamspeak6/data
+
+[Install]
+WantedBy=multi-user.target
